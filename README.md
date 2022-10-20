@@ -3,6 +3,68 @@
 ## Database Schema Design
 
 `<insert database schema design here>`
+users:
+	id
+	fname
+	lname
+	email
+	uname
+	password
+
+spots:
+	id
+	ownerId
+	address
+	city
+	state
+	country
+	lat
+	lng
+	name
+	desc
+	price
+	Cat
+	Uat
+
+reviews:
+	userId
+	SpotId
+	review
+	stars
+	Cat
+	Uat
+	user:
+		fname
+		lname
+	spot:
+		ownerId
+		address
+		city
+		state
+		country
+		lat
+		lng
+		name
+		price
+		previewimage
+	reviewImages:
+		url
+
+bookings:
+	spotId
+	userId
+	startDate
+	EndDate
+	Cat
+	Uat
+
+joinSpotsUsersReviewsBookings:
+ userId ref users(id)
+ spotId ref spots(id)
+ bookingId ref bookings(id)
+ reviewId ref reviews(id)
+
+
 
 ## API Documentation
 
