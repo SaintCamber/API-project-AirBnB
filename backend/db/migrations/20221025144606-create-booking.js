@@ -16,18 +16,23 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       startDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:Sequelize.literal('CURRENT_TIMESTAMP')
       },
       endDate: {
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:Sequelize.literal('CURRENT_TIMESTAMP')
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue:Sequelize.literal('CURRENT_TIMESTAMP')
+
       }
     });
   },
