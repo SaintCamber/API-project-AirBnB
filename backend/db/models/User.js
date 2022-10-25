@@ -1,6 +1,6 @@
-'use strict';
-const { Model, Validator } = require('sequelize');
-const bcrypt = require('bcryptjs');
+"use strict";
+const { Model, Validator } = require("sequelize");
+const bcrypt = require("bcryptjs");
 
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
@@ -9,10 +9,9 @@ module.exports = (sequelize, DataTypes) => {
       return { id, username, email };
     }
     static associate(models) {
-      User.hasMany(models.Spot,{foreignKey:"ownerId"})
-      User.hasMany(models.Booking,{foreignKey:"userId"})
-      User.hasMany(models.Review,{foreignKey:"userId"})
-      
+      User.hasMany(models.Spot, { foreignKey: "ownerId" });
+      User.hasMany(models.Booking, { foreignKey: "userId" });
+      User.hasMany(models.Review, { foreignKey: "userId" });
     }
     validatePassword(password) {
       return bcrypt.compareSync(password, this.hashedPassword.toString());
@@ -21,17 +20,17 @@ module.exports = (sequelize, DataTypes) => {
       return User.scope("currentUser").findByPk(id);
     }
     static async login({ credential, password }) {
-      const { Op } = require('sequelize');
-      const user = await User.scope('loginUser').findOne({
+      const { Op } = require("sequelize");
+      const user = await User.scope("loginUser").findOne({
         where: {
           [Op.or]: {
             username: credential,
-            email: credential
-          }
-        }
+            email: credential,
+          },
+        },
       });
       if (user && user.validatePassword(password)) {
-        return await User.scope('currentUser').findByPk(user.id);
+        return await User.scope("currentUser").findByPk(user.id);
       }
     }
     static async signup({ username, email, password }) {
@@ -39,15 +38,16 @@ module.exports = (sequelize, DataTypes) => {
       const user = await User.create({
         username,
         email,
-        hashedPassword
+        hashedPassword,
       });
-      return await User.scope('currentUser').findByPk(user.id);
+      return await User.scope("currentUser").findByPk(user.id);
     }
+  }
 
-  };
-  
   User.init(
     {
+      firstName: { type: DataTypes.STRING },
+      lastName: { type: DataTypes.STRING },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -57,41 +57,41 @@ module.exports = (sequelize, DataTypes) => {
             if (Validator.isEmail(value)) {
               throw new Error("Cannot be an email.");
             }
-          }
-        }
+          },
+        },
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
           len: [3, 256],
-          isEmail: true
-        }
+          isEmail: true,
+        },
       },
       hashedPassword: {
         type: DataTypes.STRING.BINARY,
         allowNull: false,
         validate: {
-          len: [60, 60]
-        }
-      }
+          len: [60, 60],
+        },
+      },
     },
     {
       sequelize,
       modelName: "User",
       defaultScope: {
         attributes: {
-          exclude: ["hashedPassword", "email", "createdAt", "updatedAt"]
-        }
+          exclude: ["hashedPassword", "email", "createdAt", "updatedAt"],
+        },
       },
       scopes: {
         currentUser: {
-          attributes: { exclude: ["hashedPassword"] }
+          attributes: { exclude: ["hashedPassword"] },
         },
         loginUser: {
-          attributes: {}
-        }
-      }
+          attributes: {},
+        },
+      },
     }
   );
   return User;
