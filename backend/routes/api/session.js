@@ -22,7 +22,7 @@ const validateLogin = [
 // Log in
 router.post("/", validateLogin, async (req, res, next) => {
   const { credential, password } = req.body;
-
+  
   const user = await User.login({ credential, password });
 
   if (!user) {
@@ -34,10 +34,18 @@ router.post("/", validateLogin, async (req, res, next) => {
   }
 
   await setTokenCookie(res, user);
-
-  return res.json({
-    user,
-  });
+  // user.firstName = req.user.firstName
+  // user.lastName = req.user.lastName
+  const payLoad = {id : req.user.id,
+    username :req.user.username,
+    firstName: req.user.firstName,
+  lastName :req.user.lastName,
+token :req.cookies['token'] }
+console.log(req.cookies['token'])
+// user.token = 
+  return res.json(
+    payLoad,
+  );
 });
 router.delete("/", (_req, res) => {
   res.clearCookie("token");
@@ -46,9 +54,9 @@ router.delete("/", (_req, res) => {
 router.get("/", restoreUser, (req, res) => {
   const { user } = req;
   if (user) {
-    return res.json({
-      user: user.toSafeObject(),
-    });
+    return res.json(
+       user.toSafeObject(),
+    );
   } else return res.json({});
 });
 
