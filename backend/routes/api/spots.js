@@ -67,6 +67,7 @@ router.post("/", requireAuth, validateNewSpot, async (req, res, next) => {
   console.log(Object.entries(req.body));
 
   let newSpot = await Spot.create({
+    ownerId: req.user.id,
     address: req.body.address,
     city: req.body.city,
     state: req.body.state,
@@ -116,4 +117,126 @@ router.post("/:spotId/images", requireAuth, async (req, res, next) => {
 
   res.json(payLoaf);
 });
+
+router.get("/current", requireAuth, async (req, res, next) => {
+  let payLoaf = []
+  let user = req.user
+  currentUserSpots = await Spot.findAll({ where: { ownerId: user.id } })
+  if (currentUserSpots)
+    for (let spot of currentUserSpots) {
+      spotAvgReviews = await Review.findAll({
+        where: { spotId: spot.id },
+        attributes: [
+          [sequelize.fn("AVG", sequelize.col("stars")), "avgRating"],
+        ],
+      });
+      previews = await SpotImage.findAll({
+        where: { spotId: spot.id, preview: true },
+        attributes: ["url"],
+      });
+
+      spotData = {
+        id: spot.id,
+        ownerId: spot.ownerId,
+        address: spot.address,
+        city: spot.city,
+        state: spot.state,
+        country: spot.country,
+        lat: spot.lat,
+        lng: spot.lng,
+        createdAt: spot.createdAt,
+        updatedAt: spot.updatedAt,
+        name: spot.name,
+        description: spot.description,
+        price: spot.price,
+      };
+      if (spotAvgReviews.length) {
+        spotData.AvgRating = spotAvgReviews[0].toJSON().avgRating;
+      }
+
+      if (previews.length) {
+        spotData.previewImage = previews[0].url;
+      }
+
+      payLoaf.push(spotData);
+    }
+  res.json({ Spots: payLoaf });
+});
+
+router.get('/:spotId', requireAuth, async (req, res, next) => {
+  let spot = await Spot.findByPk(req.params.spotId)
+  let payLoaf = []
+  if (!spot) {
+    res.status(404)
+    let payLoaf = {
+      message: "Spot couldn't be found",
+      statusCode: 404
+    }
+    res.json(payLoaf)
+  }
+  spotAvgReviews = await Review.findAll({
+    where: { spotId: spot.id },
+    attributes: [
+      [sequelize.fn("AVG", sequelize.col("stars")), "avgRating"],
+    ],
+  });
+  previews = await SpotImage.findAll({
+    where: { spotId: spot.id },
+    attributes: ["id", "url", "preview"]
+  });
+
+  spotData = {
+    id: spot.id,
+    ownerId: spot.ownerId,
+    address: spot.address,
+    city: spot.city,
+    state: spot.state,
+    country: spot.country,
+    lat: spot.lat,
+    lng: spot.lng,
+    createdAt: spot.createdAt,
+    updatedAt: spot.updatedAt,
+    name: spot.name,
+    description: spot.description,
+    price: spot.price,
+  };
+  if (spotAvgReviews.length) {
+    spotData.AvgRating = spotAvgReviews[0].toJSON().avgRating;
+  }
+
+  if (previews.length) {
+    spotData.spotImages = previews
+  }
+
+  payLoaf.push(spotData);
+  res.json({ Spots: payLoaf })
+}
+);
+
+
+
+router.put('/:spotId', requireAuth, handleValidationErrors,async (req, res, next) => {
+ let spot = await Spot.findByPk(req.params.spotId)
+ if(!spot){
+  res.json({message:"spot not found",statusCode: 404})
+ }
+ if(spot.ownerId === req.user.id){
+  if (req.body.address) { spot.address = req.body.address }
+if (req.body.city) { spot.city = req.body.city }
+if (req.body.state) {spot.state = req.body.state}
+if (req.body.country) {spot.country = req.body.country}
+if (req.body.lat) {spot.lat = req.body.lat}
+if(req.body.lng){spot.lng = req.body.lng}
+if(req.body.createdAt){spot.createdAt = req.body.createdAt}
+if(req.body.updatedAt){spot.updatedAt = req.body.updatedAt}
+if(req.body.name){spot.name = req.body.name}
+if(req.body.description){spot.description = req.body.description}
+if(req.body.price){spot.price = req.body.price}}
+ spot.save()
+res.json(spot)
+})
+
+
+
 module.exports = router;
+
