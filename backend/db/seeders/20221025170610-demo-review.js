@@ -13,11 +13,10 @@ module.exports = {
      * }], {});
     */
      await queryInterface.bulkInsert('Reviews', [
-      {"spotId":1,
-      "userId":1,
-      "review":"in hac habitasse platea dictumst maecenas ut massa quis augue luctus tincidunt nulla mollis molestie lorem quisque ut erat",
-      "stars":3},
-
+      {"spotId":1,"userId":1,"review":"in hac habitasse platea dictumst maecenas ut massa quis augue luctus tincidunt nulla mollis molestie lorem quisque ut erat","stars":3},
+{"spotId":1,"userId":2,"review":"gravida nisi at nibh in hac habitasse platea dictumst aliquam augue","stars":5},
+{"spotId":1,"userId":3,"review":"eget massa tempor convallis nulla neque libero convallis eget eleifend luctus ultricies eu","stars":2},
+        
        ], {});
   },
 
