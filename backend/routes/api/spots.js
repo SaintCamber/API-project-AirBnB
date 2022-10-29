@@ -274,11 +274,12 @@ router.post(
   async (req, res, next) => {
     let spot = await Spot.findByPk(req.params.spotId);
     let spotPreviousReviews = await Review.findAll({
-      where: { spotId: req.params.spotId },
+      where: { SpotId: req.params.spotId },
     });
     console.log(spotPreviousReviews);
     for (let review of spotPreviousReviews) {
-      if (review.userId === req.user.id) {
+      console.log(review.dataValues)
+      if (review.dataValues.userId === req.user.id) {
         res.json({
           message: "User already has a review for this spot",
           statusCode: 403,
