@@ -21,14 +21,14 @@ router.get('/current',requireAuth,async (req,res,next)=>{
 })
 
 
-router.put("/:BookingId",requireAuth,async (req,res,next)=>{
-    let bookingToEdit = await Booking.findAll({where:{id:req.params.BookingId},include:{model:User}})
+router.put("/:bookingId",requireAuth,async (req,res,next)=>{
+    let bookingToEdit = await Booking.findAll({where:{id:req.params.bookingId},include:{model:User}})
     let payLoaf = []
     if(!bookingToEdit.length){
         res.json({message:"no booking found with that id",statusCode:404})
     }
-    bookingToEdit.startDate = req.body.startDate
-    bookingToEdit.endDate = req.body.endDate
+    bookingToEdit.startDate = new Date(req.body.startDate)
+    bookingToEdit.endDate = new Date(req.body.endDate)
     
     
     if(req.user.id===bookingToEdit.ownerId){
