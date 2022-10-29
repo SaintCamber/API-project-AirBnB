@@ -26,6 +26,16 @@ module.exports = {
       spotId:1,
       url:'www.hergoesanimage3 .com',
       preview: false
+    },
+    {
+      spotId:1,
+      url:'www.hergoesanimage4 .com',
+      preview: false
+    },
+    {
+      spotId:1,
+      url:'www.hergoesanimage5 .com',
+      preview: false
     }], {});
   },
 
@@ -35,6 +45,9 @@ module.exports = {
      *
      * Example:
      * await queryInterface.bulkDelete('People', null, {});
+     *
      */
+ await queryInterface.bulkDelete('SpotImages', null, {})
+    
   },
 };

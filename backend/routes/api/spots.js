@@ -1,20 +1,26 @@
 const express = require("express");
 const sequelize = require("sequelize");
 const { setTokenCookie, requireAuth } = require("../../utils/auth");
-const { Spot, Review, SpotImage } = require("../../db/models");
+const { Spot, Review, SpotImage, ReviewImage } = require("../../db/models");
 const { check } = require("express-validator");
 const { handleValidationErrors } = require("../../utils/validation");
 const { appendFile } = require("fs");
 const { argv } = require("process");
 // ...
 const router = express.Router();
-validateNewSpot = [
-  check("address")
-    .exists({ checkFalsy: true })
-    .isString()
-    .withMessage("please give a valid address"),
-  check("city").exists().isString().withMessage("city name invalid"),
-];
+
+// const validateNewSpot = [
+//   check("address").exists({ checkFalsy: true }).isLength({min:3,max:20}).withMessage('please add a valid address'),
+//   check("city").exists({ checkFalsy: true }).isLength({min:3,max:20}).withMessage("please add a valid city"),
+//   check("state").exists({ checkFalsy: true }).isLength({min:3,max:20}).withMessage("please add a valid state"),
+//   check("country").exists({ checkFalsy: true }).isLength({min:3,max:20}).withMessage("please add a valid country"),
+//   check("lat").exists({ checkFalsy: true }).isNumeric({min:-180,max:180}).withMessage("please add a valid lat "),
+//   check("lng").exists({ checkFalsy: true }).isNumeric({min:-180,max:180}).withMessage("please add a valid lng"),
+//   check("name").exists({ checkFalsy: true }).isLength({min:3,max:20}).withMessage("please add a valid name"),
+//   check("description").exists({ checkFalsy: true }).isLength({min:3,max:500}).withMessage("please add a valid description"),
+//   check("price").exists({ checkFalsy: true }).isNumeric().withMessage("please add a valid price"),
+//   // handleValidationErrors
+// ]
 
 router.get("/", requireAuth, async (req, res, next) => {
   payLoad = [];
@@ -63,7 +69,7 @@ router.get("/", requireAuth, async (req, res, next) => {
   res.json({ Spots: payLoad });
 });
 
-router.post("/", requireAuth, validateNewSpot, async (req, res, next) => {
+router.post("/", requireAuth, async (req, res, next) => {
   console.log(Object.entries(req.body));
 
   let newSpot = await Spot.create({
@@ -78,8 +84,10 @@ router.post("/", requireAuth, validateNewSpot, async (req, res, next) => {
     description: req.body.description,
     price: req.body.price,
   });
+  // validateNewSpot
   newSpot.save();
   let payLoaf = {
+    id: newSpot.id,
     address: newSpot.address,
     city: newSpot.city,
     state: newSpot.state,
@@ -89,6 +97,8 @@ router.post("/", requireAuth, validateNewSpot, async (req, res, next) => {
     name: newSpot.name,
     description: newSpot.description,
     price: newSpot.price,
+    createdAt: newSpot.createdAt,
+    updatedAt: newSpot.updatedAt,
   };
   res.status(201);
   res.json(payLoaf);
@@ -97,10 +107,12 @@ router.post("/:spotId/images", requireAuth, async (req, res, next) => {
   const spot = await Spot.findByPk(req.params.spotId);
 
   if (!spot) {
-    const err = new Error("Spot couldn't be found");
-    err.status = 404;
-    err.errors = ["Spot couldn't be found"];
-    return next(err);
+    res.status(404);
+    let payLoaf = {
+      message: "Spot couldn't be found",
+      statusCode: 404,
+    };
+    res.json(payLoaf);
   }
 
   let newImage = await SpotImage.create({
@@ -119,9 +131,9 @@ router.post("/:spotId/images", requireAuth, async (req, res, next) => {
 });
 
 router.get("/current", requireAuth, async (req, res, next) => {
-  let payLoaf = []
-  let user = req.user
-  currentUserSpots = await Spot.findAll({ where: { ownerId: user.id } })
+  let payLoaf = [];
+  let user = req.user;
+  currentUserSpots = await Spot.findAll({ where: { ownerId: user.id } });
   if (currentUserSpots)
     for (let spot of currentUserSpots) {
       spotAvgReviews = await Review.findAll({
@@ -163,26 +175,24 @@ router.get("/current", requireAuth, async (req, res, next) => {
   res.json({ Spots: payLoaf });
 });
 
-router.get('/:spotId', requireAuth, async (req, res, next) => {
-  let spot = await Spot.findByPk(req.params.spotId)
-  let payLoaf = []
+router.get("/:spotId", requireAuth, async (req, res, next) => {
+  let spot = await Spot.findByPk(req.params.spotId);
+  let payLoaf = [];
   if (!spot) {
-    res.status(404)
+    res.status(404);
     let payLoaf = {
       message: "Spot couldn't be found",
-      statusCode: 404
-    }
-    res.json(payLoaf)
+      statusCode: 404,
+    };
+    res.json(payLoaf);
   }
   spotAvgReviews = await Review.findAll({
     where: { spotId: spot.id },
-    attributes: [
-      [sequelize.fn("AVG", sequelize.col("stars")), "avgRating"],
-    ],
+    attributes: [[sequelize.fn("AVG", sequelize.col("stars")), "avgRating"]],
   });
   previews = await SpotImage.findAll({
     where: { spotId: spot.id },
-    attributes: ["id", "url", "preview"]
+    attributes: ["id", "url", "preview"],
   });
 
   spotData = {
@@ -205,38 +215,113 @@ router.get('/:spotId', requireAuth, async (req, res, next) => {
   }
 
   if (previews.length) {
-    spotData.spotImages = previews
+    spotData.spotImages = previews;
   }
 
   payLoaf.push(spotData);
-  res.json({ Spots: payLoaf })
-}
+  res.json({ Spots: payLoaf });
+});
+
+router.put("/:spotId", requireAuth, async (req, res, next) => {
+  let spot = await Spot.findByPk(req.params.spotId);
+  if (!spot) {
+    res.json({ message: "spot not found", statusCode: 404 });
+  }
+  //  if(spot.ownerId === req.user.id){
+  if (req.body.address) {
+    spot.address = req.body.address;
+  }
+  if (req.body.city) {
+    spot.city = req.body.city;
+  }
+  if (req.body.state) {
+    spot.state = req.body.state;
+  }
+  if (req.body.country) {
+    spot.country = req.body.country;
+  }
+  if (req.body.lat) {
+    spot.lat = req.body.lat;
+  }
+  if (req.body.lng) {
+    spot.lng = req.body.lng;
+  }
+  if (req.body.createdAt) {
+    spot.createdAt = req.body.createdAt;
+  }
+  if (req.body.updatedAt) {
+    spot.updatedAt = req.body.updatedAt;
+  }
+  if (req.body.name) {
+    spot.name = req.body.name;
+  }
+  if (req.body.description) {
+    spot.description = req.body.description;
+  }
+  if (req.body.price) {
+    spot.price = req.body.price;
+  }
+  // }
+
+  spot.save();
+  res.json(spot);
+});
+
+router.post(
+  "/:spotId/reviews",
+  requireAuth,
+  handleValidationErrors,
+  async (req, res, next) => {
+    let spot = await Spot.findByPk(req.params.spotId);
+    let spotPreviousReviews = await Review.findAll({
+      where: { spotId: req.params.spotId },
+    });
+    console.log(spotPreviousReviews);
+    for (let review of spotPreviousReviews) {
+      if (review.userId === req.user.id) {
+        res.json({
+          message: "User already has a review for this spot",
+          statusCode: 403,
+        });
+      }
+    }
+
+    if (!spot) {
+      res.json({ message: "spot couldn't be found", statusCode: 404 });
+    }
+    // create a review on the entry with spot id of spotId.
+    let newReview = await Review.create({
+      spotId: req.params.spotId,
+      userId: req.user.id,
+      review:
+        "lorem ipsum blah blah blah comment goes here blah diddy blah diddy blah",
+      stars: 5,
+    });
+    newReview.save();
+    res.json(newReview);
+  }
 );
 
+router.get("/:spotId/reviews", requireAuth, async (req, res, next) => {
+  const spot = await Spot.findByPk(req.params.spotId);
+
+  if (!spot) {
+    res.status(404);
+    let payLoaf = {
+      message: "Spot couldn't be found",
+      statusCode: 404,
+    };
+    res.json(payLoaf);
+  }
+
+  let reviews = await Review.findAll({
+    where: { spotId: spot.id,  },include: { model: ReviewImage }
+  });
+
+  res.json(reviews);
+});
 
 
-router.put('/:spotId', requireAuth, handleValidationErrors,async (req, res, next) => {
- let spot = await Spot.findByPk(req.params.spotId)
- if(!spot){
-  res.json({message:"spot not found",statusCode: 404})
- }
- if(spot.ownerId === req.user.id){
-  if (req.body.address) { spot.address = req.body.address }
-if (req.body.city) { spot.city = req.body.city }
-if (req.body.state) {spot.state = req.body.state}
-if (req.body.country) {spot.country = req.body.country}
-if (req.body.lat) {spot.lat = req.body.lat}
-if(req.body.lng){spot.lng = req.body.lng}
-if(req.body.createdAt){spot.createdAt = req.body.createdAt}
-if(req.body.updatedAt){spot.updatedAt = req.body.updatedAt}
-if(req.body.name){spot.name = req.body.name}
-if(req.body.description){spot.description = req.body.description}
-if(req.body.price){spot.price = req.body.price}}
- spot.save()
-res.json(spot)
-})
-
-
+router,post('/spots/:spotIdForBooking/bookings')
 
 module.exports = router;
-

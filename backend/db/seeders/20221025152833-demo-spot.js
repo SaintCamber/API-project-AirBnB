@@ -16,7 +16,7 @@ module.exports = {
     price: 1337
     },
     {
-    ownerId: 1,
+      ownerId: 1,
     address:'2 berry lane',
     city:'dairytopia',
     state: 'chocolatteia',
@@ -38,7 +38,31 @@ module.exports = {
     name: 'Candyland Castle',
     description:"i mean its a castle in candyland i guess",
     price: 1337
-    }
+    },
+    {
+      ownerId: 1,
+    address:'4 berry lane',
+    city:'dairytopia',
+    state: 'chocolatteia',
+    country: "candyland",
+    lat: 94,
+    lng: 94,
+    name: 'Candyland Castle',
+    description:"i mean its a castle in candyland i guess",
+    price: 1337
+    },
+    {
+      ownerId: 3,
+    address:'5 berry lane',
+    city:'dairytopia',
+    state: 'chocolatteia',
+    country: "candyland",
+    lat: 95,
+    lng: 95,
+    name: 'Candyland Castle',
+    description:"i mean its a castle in candyland i guess",
+    price: 1337
+    },
     ], {});
   },
 
