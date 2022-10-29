@@ -13,27 +13,27 @@ module.exports = {
      * }], {});
      */
     await queryInterface.bulkInsert("SpotImages", [{
-      spotId:1,
+      SpotId:1,
       url:'www.hergoesanimage1 .com',
       preview: false
     },
     {
-      spotId:1,
+      SpotId:1,
       url:'www.hergoesanimage2 .com',
       preview: true
     },
     {
-      spotId:1,
+      SpotId:1,
       url:'www.hergoesanimage3 .com',
       preview: false
     },
     {
-      spotId:1,
+      SpotId:1,
       url:'www.hergoesanimage4 .com',
       preview: false
     },
     {
-      spotId:1,
+      SpotId:1,
       url:'www.hergoesanimage5 .com',
       preview: false
     }], {});
