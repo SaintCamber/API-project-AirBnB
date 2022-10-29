@@ -322,6 +322,6 @@ router.get("/:spotId/reviews", requireAuth, async (req, res, next) => {
 });
 
 
-router,post('/spots/:spotIdForBooking/bookings')
+router.post('/spots/:spotIdForBooking/bookings')
 
 module.exports = router;
