@@ -1,7 +1,7 @@
 const express = require("express");
 const sequelize = require("sequelize");
 const { setTokenCookie, requireAuth } = require("../../utils/auth");
-const { Spot, Review, SpotImage, ReviewImage } = require("../../db/models");
+const { Spot, Review, SpotImage, ReviewImage, Booking } = require("../../db/models");
 const { check } = require("express-validator");
 const { handleValidationErrors } = require("../../utils/validation");
 const { appendFile } = require("fs");
@@ -315,13 +315,72 @@ router.get("/:spotId/reviews", requireAuth, async (req, res, next) => {
   }
 
   let reviews = await Review.findAll({
-    where: { spotId: spot.id,  },include: { model: ReviewImage }
+    where: { spotId: spot.id, }, include: { model: ReviewImage }
   });
 
   res.json(reviews);
 });
 
 
-router.post('/spots/:spotIdForBooking/bookings')
+router.post('/:spotIdForBooking/bookings', requireAuth, async (req, res, next) => {
+  let spot = await Spot.findByPk(req.params.spotIdForBooking)
+  if (!spot) {
+    res.json({ message: 'spot not found', statusCode: 404 })
+  }
+  if (spot.ownerId === req.user.id) {
+    res.json({ message: "you can't book your own spot" })
+  }
+  let available = true
+  let bookings = await Booking.findAll({ where: { spotId: spot.id } })
+  for (let i = 0; i < bookings.length; i++) {
 
+    let booking = bookings[i]
+    let bookingStart = new Date(booking.startDate)
+    let bookingEnd = new Date(booking.endDate)
+    let reqStart = new Date(req.body.startDate)
+    let reqEnd = new Date(req.body.endDate)
+    let errors = {}
+
+    if (reqStart >= bookingStart && reqStart <= bookingEnd) {
+      available = false
+      errors.startDate = "Start date conflicts with an existing booking"
+    }
+if (reqEnd >= bookingStart && reqEnd <= bookingEnd) {
+  available = false
+  errors.endDate = "end date conflicts with an existing booking"
+
+}
+if (available === false) {
+  return res.json({ message: "Sorry, this spot is already booked for the specified dates", statusCode: 403, "errors": errors })
+}
+  }
+
+let newBooking = await Booking.create({
+  spotId: req.params.spotIdForBooking,
+  userId: req.user.id,
+  startDate: new Date(req.body.startDate),
+  endDate: new Date(req.body.endDate)
+})
+
+
+newBooking.save()
+res.json(newBooking)
+  
+  })
+
+  router.get('/:spotIdForBooking/bookings', requireAuth, async (req, res, next) => {
+    let Allbookings = await Booking.findAll({where:{spotId:req.params.spotIdForBooking}})
+    if(!Allbookings.length){
+      res.json({message:'no current bookings found'})
+    }
+    let payLoaf = []
+
+    for (let booking of Allbookings){
+      let Data = {spotId:booking.spotId,startDate:booking.startDate,endDate:booking.endDate}
+      payLoaf.push(Data)
+    }
+    res.json({Bookings:payLoaf})
+  })
+ 
+  
 module.exports = router;
