@@ -381,6 +381,25 @@ res.json(newBooking)
     }
     res.json({Bookings:payLoaf})
   })
- 
+  router.put("/BookingId",requireAuth,async (req,res,next)=>{
+    let bookingToEdit = await Booking.findAll({where:{id:req.params.BookingId},include:{model:User}})
+    payLoaf = []
+    if(!bookingToEdit.length){
+        res.json({message:"no booking found with that id",statusCode:404})
+    }
+    bookingToEdit.startDate = req.body.startDate
+    bookingToEdit.endDate = req.body.endDate
+    bookingToEdit.save()
+    
+    if(req.user.id===bookingToEdit.ownerId){
+        res.json(bookingToEdit)
+    }
+    payloaf.push({id: bookingToEdit.id,
+                startDate: bookingToEdit.startDate,
+                endDate:bookingToEdit.endDate})
+
+    res.json({Bookings:payLoaf})
+
+})
   
 module.exports = router;
