@@ -11,11 +11,14 @@ module.exports = {
       },
       spotId: {
         type: Sequelize.INTEGER,
-        foreignKey:true
+        references:{model:"Spots",key:"id",as:"spotId"}
+        
+        
       },
       userId: {
         type: Sequelize.INTEGER,
-        foreignKey:true
+        references:{model:"Users",key:"id",as:"userId"}
+        
       },
       review: {
         type: Sequelize.STRING

@@ -10,10 +10,11 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       spotId: {
-        type: Sequelize.INTEGER,foreignKey:true
+        
+        type: Sequelize.INTEGER,references:{model:"Spots",key:"id",as:"spotId"}
       },
       userId: {
-        type: Sequelize.INTEGER,foreignKey:true
+        type: Sequelize.INTEGER,references:{model:"Users",key:"id",as:"userId"}
       },
       
       startDate: {
