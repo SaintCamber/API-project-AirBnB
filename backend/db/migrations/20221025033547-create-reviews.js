@@ -9,12 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      SpotId: {
+      spotId: {
         type: Sequelize.INTEGER,
-        references:{model:Spot}
+        foreignKey:true
       },
       userId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,
+        foreignKey:true
       },
       review: {
         type: Sequelize.STRING

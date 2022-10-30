@@ -9,12 +9,13 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      SpotId: {
-        type: Sequelize.INTEGER
+      spotId: {
+        type: Sequelize.INTEGER,foreignKey:true
       },
       userId: {
-        type: Sequelize.INTEGER
+        type: Sequelize.INTEGER,foreignKey:true
       },
+      
       startDate: {
         type: Sequelize.DATE,
         defaultValue:Sequelize.literal('CURRENT_TIMESTAMP')

@@ -29,7 +29,6 @@ module.exports = (sequelize, DataTypes) => {
           },
         },
       });
-      console.log(user)
       if (user && user.validatePassword(password)) {
         return await User.scope("currentUser").findByPk(user.id);
       }
