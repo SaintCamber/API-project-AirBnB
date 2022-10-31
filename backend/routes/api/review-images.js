@@ -12,9 +12,9 @@ const router = express.Router();
 router.delete('/:reviewId',requireAuth,async (req,res)=>{
     let reviewToDelete = await ReviewImage.findByPk(req.params.reviewId)
     if(!reviewToDelete){
-        res.json({message:"image not found"})
+        res.json({message:"image not found",statusCode:404})
     }
     reviewToDelete.destroy()
-    res.json({message:"record deleted"})
+    res.json({message:"record deleted",statusCode:200})
 })
 module.exports = router

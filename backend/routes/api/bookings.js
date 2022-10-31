@@ -54,10 +54,10 @@ router.put("/:bookingId", requireAuth, async (req, res, next) => {
 router.delete("/:bookingId", requireAuth, async (req, res) => {
   let bookingToDelete = await Booking.findByPk(req.params.bookingId);
   if (!bookingToDelete) {
-    res.json({ message: "image not found" });
+    res.json({ message: "image not found" ,statusCode:404});
   }
   bookingToDelete.destroy();
-  res.json({ message: "record deleted" });
+  res.json({ message: "record deleted",statusCode:200 });
 });
 module.exports = router;
 module.exports = router;
