@@ -417,11 +417,32 @@ router.get(
 
 router.delete("/:spotId", requireAuth, async (req, res) => {
   let spotToDelete = await Spot.findByPk(req.params.spotId);
+  // console.log('-------------',spotToDelete.id,'------------------')
   if (!spotToDelete) {
     res.json({ message: "spot not found" });
+    return
   }
-  spotToDelete.destroy();
-  res.json({ message: "record deleted" });
-});
+  try{
+    await spotToDelete.destroy()
+
+  } catch(err) {
+    // console.log('----------------')
+    // console.log('----------------')
+    // console.log('----------------')
+    // console.log('----------------')
+    console.log('There was an error!', err);
+    // console.log('----------------')
+    // console.log('----------------')
+    // console.log('----------------')
+    // console.log('----------------')
+
+    
+  }
+
+  
+    
+    res.json({ message: "record deleted" });
+  });
+
 
 module.exports = router;
