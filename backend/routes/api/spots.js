@@ -104,6 +104,7 @@ router.post("/", requireAuth, async (req, res, next) => {
   newSpot.save();
   let payLoaf = {
     id: newSpot.id,
+    ownerId:newSpot.ownerId,
     address: newSpot.address,
     city: newSpot.city,
     state: newSpot.state,
@@ -346,9 +347,9 @@ router.post(
     if (!spot) {
       res.json({ message: "spot not found", statusCode: 404 });
     }
-    if (spot.ownerId === req.user.id) {
-      res.json({ message: "you can't book your own spot" });
-    }
+    // if (spot.ownerId === req.user.id) {
+    //   res.json({ message: "you can't book your own spot" });
+    // }
     let available = true;
     let bookings = await Booking.findAll({ where: { spotId: spot.id } });
     for (let i = 0; i < bookings.length; i++) {
@@ -368,24 +369,26 @@ router.post(
         errors.endDate = "end date conflicts with an existing booking";
       }
       if (available === false) {
-        return res.json({
+         res.json({
           message: "Sorry, this spot is already booked for the specified dates",
           statusCode: 403,
           errors: errors,
         });
       }
     }
+if(available===true){
 
-    let newBooking = await Booking.create({
-      spotId: req.params.spotIdForBooking,
-      userId: req.user.id,
-      startDate: new Date(req.body.startDate),
-      endDate: new Date(req.body.endDate),
-    });
-
-    newBooking.save();
-    res.json(newBooking);
-  }
+  let newBooking = await Booking.create({
+    spotId: req.params.spotIdForBooking,
+    userId: req.user.id,
+    startDate: new Date(req.body.startDate),
+    endDate: new Date(req.body.endDate),
+  });
+  
+  
+  res.json(newBooking);
+}
+}
 );
 
 router.get(

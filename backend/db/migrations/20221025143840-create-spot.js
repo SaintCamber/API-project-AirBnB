@@ -11,7 +11,6 @@ module.exports = {
       },
       ownerId: {
         type: Sequelize.INTEGER,
-        foreignKey: true,
         references:{model:"Users",key:"id",as:"ownerId"}
       },
       address: {

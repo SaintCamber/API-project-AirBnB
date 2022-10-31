@@ -16,47 +16,47 @@ module.exports = {
     price: 1337
     },
     {
-      ownerId: 1,
+      ownerId: 2,
     address:'2 berry lane',
     city:'dairytopia',
     state: 'chocolatteia',
     country: "candyland",
     lat: 91,
     lng: 91,
-    name: 'Candyland Castle',
+    name: 'Candyland Castle2',
     description:"i mean its a castle in candyland i guess",
     price: 1337
     },
     {
-    ownerId: 2,
+    ownerId: 3,
     address:'3 berry lane',
     city:'dairytopia',
     state: 'chocolatteia',
     country: "candyland",
     lat: 92,
     lng: 92,
-    name: 'Candyland Castle',
+    name: 'Candyland Castle3',
     description:"i mean its a castle in candyland i guess",
     price: 1337
     },
     {
-      ownerId: 1,
+      ownerId: 4,
     address:'4 berry lane',
     city:'dairytopia',
     state: 'chocolatteia',
     country: "candyland",
     lat: 94,
     lng: 94,
-    name: 'Candyland Castle',
+    name: 'Candyland Castle4',
     description:"i mean its a castle in candyland i guess",
     price: 1337
     },
     {
-      ownerId: 3,
+      ownerId: 5,
     address:'5 berry lane',
     city:'dairytopia',
     state: 'chocolatteia',
-    country: "candyland",
+    country: "candyland5",
     lat: 95,
     lng: 95,
     name: 'Candyland Castle',
@@ -68,8 +68,6 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     const Op = Sequelize.Op;
-    return queryInterface.bulkDelete('Spots', {
-      name: { [Op.in]: ["candyland Castle"] }
-    }, {});
+    return queryInterface.bulkDelete('Spots', null, {});
   }
 };

@@ -43,8 +43,7 @@ router.post("/:reviewId/images", requireAuth, async (req, res, next) => {
     spotId: req.params.spotId,
     url: req.body.url,
   });
-  newImage.save();
-
+  console.log(newImage)
   const payLoaf = {
     id: newImage.id,
     url: newImage.url,
@@ -53,25 +52,25 @@ router.post("/:reviewId/images", requireAuth, async (req, res, next) => {
   res.json(payLoaf);
 });
 
-router.put('/:reviewId',requireAuth,async(req,res)=>{
-    let reviewToEdit = await Review.findByPk(req.params.reviewId)
-    if(!reviewToEdit){
-        res.json({message:'review not found',statusCode:404})
-    }
-    reviewToEdit.review = req.body.review
-    reviewToEdit.stars = req.body.stars
-    reviewToEdit.save()
-    res.json(reviewToEdit)
+router.put('/:reviewId', requireAuth, async (req, res) => {
+  let reviewToEdit = await Review.findByPk(req.params.reviewId)
+  if (!reviewToEdit) {
+    res.json({ message: 'review not found', statusCode: 404 })
+  }
+  reviewToEdit.review = req.body.review
+  reviewToEdit.stars = req.body.stars
+  reviewToEdit.save()
+  res.json(reviewToEdit)
 })
 
 
-router.delete('/:reviewId',requireAuth,async (req,res)=>{
+router.delete('/:reviewId', requireAuth, async (req, res) => {
   let reviewToDelete = await Review.findByPk(req.params.reviewId)
-  if(!reviewToDelete){
-      res.json({message:"review not found"})
+  if (!reviewToDelete) {
+    res.json({ message: "review not found" })
   }
   reviewToDelete.destroy()
-  res.json({message:"record deleted"})
+  res.json({ message: "record deleted" })
 })
 module.exports = router;
 module.exports = router;
