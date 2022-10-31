@@ -2,6 +2,7 @@ const express = require("express");
 const sequelize = require("sequelize");
 const { setTokenCookie, requireAuth } = require("../../utils/auth");
 const {
+  User,
   Spot,
   Review,
   SpotImage,
@@ -333,7 +334,7 @@ router.get("/:spotId/reviews", requireAuth, async (req, res, next) => {
 
   let reviews = await Review.findAll({
     where: { spotId: spot.id },
-    include: { model: ReviewImage },
+    include: [{ model: ReviewImage,attributes:["id","url"]},{model:User,attributes:["id","firstName","lastName"] }]
   });
 
   res.json(reviews);
