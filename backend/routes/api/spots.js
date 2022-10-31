@@ -396,6 +396,7 @@ router.get(
   "/:spotIdForBooking/bookings",
   requireAuth,
   async (req, res, next) => {
+    let Data;
     let Allbookings = await Booking.findAll({
       where: { spotId: req.params.spotIdForBooking },
     });
@@ -405,13 +406,19 @@ router.get(
     let payLoaf = [];
 
     for (let booking of Allbookings) {
-      let Data = {
-        spotId: booking.spotId,
-        startDate: booking.startDate,
-        endDate: booking.endDate,
-      };
-      payLoaf.push(Data);
-    }
+      if(req.user.id===booking.ownerId){
+        Data = {booking}
+      }
+      else{
+         Data = {
+          spotId: booking.spotId,
+          startDate: booking.startDate,
+          endDate: booking.endDate,
+        };
+        payLoaf.push(Data);
+      }
+
+      }
     res.json({ Bookings: payLoaf });
   }
 );
